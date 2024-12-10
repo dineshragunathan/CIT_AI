@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from "react";
-import Button from "@mui/material/Button";
 import "./SemesterDetails.css";
+import axios from 'axios';
 
-const SemesterDetails = ({ semester, data, onChange }) => {
-  const [courses, setCourses] = useState(data);
+const SemesterDetails = ({ data, onChange }) => {
+  
+  const semester = {
+    semesterId: 1,
+    semesterName: 'Fall 2024',
+    startDate: '2024-08-01',
+    endDate: '2024-12-15',
+    department: 'Computer Science',
+  };
 
+  const [courses, setCourses] = useState(data || []); 
+
+  // Update courses when data prop changes
   useEffect(() => {
-    setCourses(data);
+    if (data && Array.isArray(data)) {
+      setCourses(data);
+    }
   }, [data]);
 
   const addCourse = () => {
-    setCourses([
-      ...courses,
+    setCourses((prevCourses) => [
+      ...prevCourses,
       {
-        id: courses.length + 1,
+        id: prevCourses.length + 1,
         regulationId: "",
         regulationName: "",
         startYear: "",
@@ -35,6 +47,7 @@ const SemesterDetails = ({ semester, data, onChange }) => {
       },
     ]);
   };
+  
 
   const handleInputChange = (e, courseId) => {
     const { name, value } = e.target;
@@ -47,6 +60,9 @@ const SemesterDetails = ({ semester, data, onChange }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("semester", semester);
+    console.log("courses", courses);
+    // Check for empty fields
     const hasEmptyFields = courses.some((course) =>
       Object.values(course).some((value) => value === "")
     );
@@ -54,14 +70,28 @@ const SemesterDetails = ({ semester, data, onChange }) => {
       alert("Please fill in all fields before submitting.");
       return;
     }
-    onChange(semester, courses);
+
+    const payload = { semester, courses };
+    console.log('Submitting payload:', payload);
+
+    // Submit form data to backend
+    axios
+      .post('http://localhost:5000/semester-details', { semester, courses })
+      .then((response) => {
+        alert('Data successfully submitted!');
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error('Error submitting data:', error);
+        alert('There was an error submitting the data.');
+      });
   };
 
   return (
     <div className="semester-details-container">
       <h2>Semester Details</h2>
       <form onSubmit={handleSubmit}>
-        {courses.map((course) => (
+        {Array.isArray(courses) && courses.map((course) => (
           <div key={course.id} className="course-container">
             <h3 id="course-h3">Course {course.id}</h3>
             {/* Row 1 */}
@@ -272,12 +302,14 @@ const SemesterDetails = ({ semester, data, onChange }) => {
           </div>
         ))}
         <div className="action-buttons">
-          <Button variant="outlined" onClick={addCourse}>
+          {/* Button to add more courses */}
+          <button type="button" onClick={addCourse}>
             Add Course
-          </Button>
-          <Button variant="contained" color="success" type="submit">
+          </button>
+          {/* Submit button */}
+          <button type="submit">
             Submit
-          </Button>
+          </button>
         </div>
       </form>
     </div>
