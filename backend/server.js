@@ -16,11 +16,12 @@ app.use(bodyParser.json());
 app.use("/", semesterRoutes);
 
 // PostgreSQL connection pool
+// eslint-disable-next-line no-unused-vars
 const pool = new Pool({
   host: "localhost",
-  user: "postgres",
-  password: "pikachu@77",
-  database: "newDB",
+  user: "dinesh",
+  password: "dinesh123",
+  database: "dinesh",
   port: 5432,
 });
 

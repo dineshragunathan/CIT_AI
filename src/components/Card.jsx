@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React from "react";
 
 function Card({
@@ -10,10 +12,10 @@ function Card({
   onOptionChange,
 }) {
   const options = [
-    `Regulation 21`,
-    `Regulation 22`,
-    `Regulation 22R`,
-    `Regulation 24`,
+    `R21`,
+    `R22`,
+    `R22R`,
+    `R24`,
   ];
 
   return (
@@ -27,7 +29,7 @@ function Card({
             <label key={index}>
               <input
                 type="radio"
-                name="regulation"
+                name="rd"
                 value={`${name}-${option}`}
                 checked={selectedOption === `${name}-${option}`}
                 onChange={() => onOptionChange(`${name}-${option}`)}

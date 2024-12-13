@@ -1,33 +1,102 @@
 import express from "express";
-import pool from "../config/db.js"
+import pool from "../config/db.js";
+
 const router = express.Router();
 
+// Insert or update course details
+// Insert or update course details
+// Insert or update course details
+// Insert or update course details
 router.post("/semester-details", async (req, res) => {
-    console.log("Received data:", req.body);
-    const { semester, courses } = req.body;
-  
-    if (!semester || !courses || !Array.isArray(courses)) {
-      return res.status(400).send("Invalid request format");
+  console.log("Received data:", req.body);
+  const { courses } = req.body;
+
+  if (!courses || !Array.isArray(courses)) {
+    return res.status(400).send("Invalid request format");
+  }
+
+  try {
+    const insertOrUpdateQuery = `
+      INSERT INTO courses (sno, department, regulation, semester, course_code, course_name, category, tp, gate_common, common_dept, credits, ltp)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      ON CONFLICT (department, regulation, semester, sno)
+      DO UPDATE SET
+        course_code = EXCLUDED.course_code,
+        course_name = EXCLUDED.course_name,
+        category = EXCLUDED.category,
+        tp = EXCLUDED.tp,
+        gate_common = EXCLUDED.gate_common,
+        common_dept = EXCLUDED.common_dept,
+        credits = EXCLUDED.credits,
+        ltp = EXCLUDED.ltp
+    `;
+
+    // Insert or update each course
+    for (let course of courses) {
+      const { sno, department, regulation, semester, course_code, course_name, category, tp, gate_common, common_dept, credits, ltp } = course;
+      await pool.query(insertOrUpdateQuery, [
+        sno,
+        department,
+        regulation,
+        semester,
+        course_code,
+        course_name,
+        category,
+        tp,
+        gate_common,
+        common_dept,
+        credits,
+        ltp,
+      ]);
     }
-  
-    try {
-      // Insert multiple course details for the semester
-      const insertQuery = `
-        INSERT INTO course_details (semester, course_id, course_code, course_name, category_name, credits, ltp)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-      `;
-      
-      // Loop through each course and insert into the table
-      for (let course of courses) {
-        const { course_id, course_code, course_name, category_name, credits, ltp } = course;
-        await pool.query(insertQuery, [semester, course_id, course_code, course_name, category_name, credits, ltp]);
-      }
-  
-      res.status(200).send({ message: 'Courses successfully inserted!' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({ message: 'Error inserting courses.' });
+
+    res.status(200).send({ message: "Courses successfully inserted or updated!" });
+  } catch (error) {
+    console.error("Error inserting/updating courses:", error);
+    res.status(500).send({ message: "Error inserting/updating courses." });
+  }
+});
+
+
+
+
+// Fetch course details
+router.get("/semester-details", async (req, res) => {
+  const { department, regulation, sno, semester } = req.query;
+
+  if (!department || !regulation) {
+    return res.status(400).send("Missing required query parameters");
+  }
+
+  try {
+    let query = `
+      SELECT sno, department, regulation, semester, course_code, course_name, category, tp, gate_common, common_dept, credits, ltp
+      FROM courses
+      WHERE department = $1 AND regulation = $2
+    `;
+    const values = [department, regulation];
+
+    if (semester) {
+      query += " AND semester = $3";
+      values.push(semester);
     }
-  });
+
+    if (sno) {
+      query += " AND sno = $4";
+      values.push(sno);
+    }
+
+    const { rows } = await pool.query(query, values);
+
+    if (rows.length > 0) {
+      res.status(200).json(rows);
+    } else {
+      res.status(404).send({ message: "No records found" });
+    }
+  } catch (error) {
+    console.error("Error fetching records:", error);
+    res.status(500).send({ message: "Error fetching records" });
+  }
+});
 
 export default router;
