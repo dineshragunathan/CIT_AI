@@ -205,6 +205,7 @@ const CourseDetails = ({ department, regulation }) => {
       backgroundColor: "black",
       borderColor: "#555555",
       color: "white",
+      width: "175px",
     }),
     menuPortal: (base) => ({
       ...base,
