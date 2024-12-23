@@ -1,11 +1,14 @@
 import React from "react";
+import "./Card.css"; // Ensure this is imported
 
 function Card({ dept, selectedOption, onOptionChange, onContinue }) {
   return (
     <div className="card-container">
       <div className={`card ${selectedOption ? "expanded" : ""}`}>
-        <h2>{dept}</h2>
-        <p>Select the regulation which you are going to fill the details for</p>
+        <h2 className="card-title">{dept}</h2>
+        <p className="card-description">
+          Select the regulation which you are going to fill the details for
+        </p>
         <form>
           <div className="radio-group">
             <label>
