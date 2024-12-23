@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import "./courseDetails.css";
@@ -39,15 +41,18 @@ const CourseDetails = ({ department, regulation }) => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      const storedCourses = getStoredCourses();
-
-      if (storedCourses) {
-        setCourses(storedCourses);
-        setLoading(false);
-        return;
-      }
 
       try {
+        // Check if data is available in local storage
+        const storedCourses = getStoredCourses();
+
+        if (storedCourses) {
+          setCourses(storedCourses);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch from the server if not available in local storage
         const response = await fetch(
           `http://localhost:5000/semester-details?department=${department}&regulation=${regulation}&semester=${semester}`
         );
@@ -78,6 +83,7 @@ const CourseDetails = ({ department, regulation }) => {
 
           setCourses(fullCourses);
         } else if (response.status === 404) {
+          // If no data exists for the current filters
           setCourses([
             {
               sno: 1,
@@ -160,7 +166,6 @@ const CourseDetails = ({ department, regulation }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(courses);
     const totalCredits = courses.reduce(
       (sum, course) => sum + (parseFloat(course.credits) || 0),
       0
@@ -234,7 +239,9 @@ const CourseDetails = ({ department, regulation }) => {
         color: "white",
       },
     }),
-  }; //from lines -192-229
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }), // Added for dropdown visibility fix
+  };
+
   return (
     <div className="semester-container">
       <h2 className="semester-header">Semester {semester} - Course Details</h2>
@@ -320,7 +327,7 @@ const CourseDetails = ({ department, regulation }) => {
                 </td>
                 <td className="common-width">
                   {course.gate_common === "Common" ||
-                  course.gate_common === "Both" ? (
+                    course.gate_common === "Both" ? (
                     <Select
                       isMulti
                       options={departments}
@@ -336,6 +343,7 @@ const CourseDetails = ({ department, regulation }) => {
                       }
                       closeMenuOnSelect={false}
                       styles={customStyles}
+                      menuPortalTarget={document.body} // Render dropdown outside of container
                     />
                   ) : (
                     <span>Not Applicable</span>
@@ -376,7 +384,6 @@ const CourseDetails = ({ department, regulation }) => {
                 &times;
               </button>
               <h2>Preview Your Courses</h2>
-              {console.log("Line 378", courses)}
               <PreviewTable courses={courses} />
               <button onClick={confirmSubmit} id="confirm-submit">
                 Confirm and Submit

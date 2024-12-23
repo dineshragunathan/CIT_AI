@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import "./courseDetails.css";
@@ -160,7 +162,6 @@ const CourseDetails = ({ department, regulation }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(courses);
     const totalCredits = courses.reduce(
       (sum, course) => sum + (parseFloat(course.credits) || 0),
       0
@@ -234,7 +235,9 @@ const CourseDetails = ({ department, regulation }) => {
         color: "white",
       },
     }),
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }), // Added for dropdown visibility fix
   };
+
   return (
     <div className="semester-container">
       <h2 className="semester-header">Semester {semester} - Course Details</h2>
@@ -320,7 +323,7 @@ const CourseDetails = ({ department, regulation }) => {
                 </td>
                 <td className="common-width">
                   {course.gate_common === "Common" ||
-                  course.gate_common === "Both" ? (
+                    course.gate_common === "Both" ? (
                     <Select
                       isMulti
                       options={departments}
@@ -336,6 +339,7 @@ const CourseDetails = ({ department, regulation }) => {
                       }
                       closeMenuOnSelect={false}
                       styles={customStyles}
+                      menuPortalTarget={document.body} // Render dropdown outside of container
                     />
                   ) : (
                     <span>Not Applicable</span>
