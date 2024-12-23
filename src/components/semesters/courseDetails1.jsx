@@ -205,14 +205,20 @@ const CourseDetails = ({ department, regulation }) => {
   const customStyles = {
     control: (base) => ({
       ...base,
-      backgroundColor: "Black",
+      backgroundColor: "black",
       borderColor: "#555555",
+      minWidth: "150px", // Adjust the starting width of the select box
+      position: "relative", // Required for positioning the arrow correctly
     }),
+
     menu: (base) => ({
       ...base,
       backgroundColor: "black",
       color: "lightgrey",
+      zIndex: 9999, // Ensure the dropdown appears above other elements
+      marginTop: "2px", // Slight margin between input and dropdown
     }),
+
     option: (base, state) => ({
       ...base,
       backgroundColor: state.isSelected
@@ -220,17 +226,20 @@ const CourseDetails = ({ department, regulation }) => {
         : state.isFocused
           ? "grey"
           : "black",
-      color: state.isSelected ? "#0056b3" : "ligthgrey",
+      color: state.isSelected ? "#0056b3" : "lightgrey",
     }),
+
     multiValue: (base) => ({
       ...base,
       backgroundColor: "#444",
       color: "#333",
     }),
+
     multiValueLabel: (base) => ({
       ...base,
       color: "white",
     }),
+
     multiValueRemove: (base) => ({
       ...base,
       color: "white",
@@ -239,8 +248,33 @@ const CourseDetails = ({ department, regulation }) => {
         color: "white",
       },
     }),
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }), // Added for dropdown visibility fix
+
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999, // Ensures the dropdown appears above other elements
+    }),
+
+    singleValue: (base) => ({
+      ...base,
+      minWidth: "150px", // Set a narrower initial width for the value container
+      color: "white",
+    }),
+
+    valueContainer: (base) => ({
+      ...base,
+      minWidth: "150px", // Set a narrower initial width for the value container
+      width: "auto",     // Allow width to grow based on content
+    }),
+
+    dropdownIndicator: (base) => ({
+      ...base,
+      color: "white", // Color for the dropdown arrow
+      position: "absolute", // Position the dropdown indicator to the right
+      right: "10px", // Adjust this if needed to make the arrow appear on the right
+    }),
   };
+
+
 
   return (
     <div className="semester-container">
