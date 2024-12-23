@@ -43,7 +43,6 @@ const CourseDetails = ({ department, regulation }) => {
       setError(null);
 
       try {
-        // Check if data is available in local storage
         const storedCourses = getStoredCourses();
 
         if (storedCourses) {
@@ -52,7 +51,6 @@ const CourseDetails = ({ department, regulation }) => {
           return;
         }
 
-        // Fetch from the server if not available in local storage
         const response = await fetch(
           `http://localhost:5000/semester-details?department=${department}&regulation=${regulation}&semester=${semester}`
         );
@@ -83,7 +81,6 @@ const CourseDetails = ({ department, regulation }) => {
 
           setCourses(fullCourses);
         } else if (response.status === 404) {
-          // If no data exists for the current filters
           setCourses([
             {
               sno: 1,
@@ -176,7 +173,7 @@ const CourseDetails = ({ department, regulation }) => {
       return;
     }
 
-    openPreview(); // Open preview modal instead of navigating
+    openPreview();
   };
 
   const confirmSubmit = async () => {
@@ -190,7 +187,7 @@ const CourseDetails = ({ department, regulation }) => {
       if (response.ok) {
         alert("Courses submitted successfully!");
         localStorage.removeItem(`courses-semester-${semester}`);
-        closePreview(); // Close modal on successful submit
+        closePreview();
       } else {
         alert("Failed to submit courses.");
       }
@@ -207,74 +204,38 @@ const CourseDetails = ({ department, regulation }) => {
       ...base,
       backgroundColor: "black",
       borderColor: "#555555",
-      minWidth: "150px", // Adjust the starting width of the select box
-      position: "relative", // Required for positioning the arrow correctly
-    }),
-
-    menu: (base) => ({
-      ...base,
-      backgroundColor: "black",
-      color: "lightgrey",
-      zIndex: 9999, // Ensure the dropdown appears above other elements
-      marginTop: "2px", // Slight margin between input and dropdown
-    }),
-
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isSelected
-        ? "#d0ebff"
-        : state.isFocused
-          ? "grey"
-          : "black",
-      color: state.isSelected ? "#0056b3" : "lightgrey",
-    }),
-
-    multiValue: (base) => ({
-      ...base,
-      backgroundColor: "#444",
-      color: "#333",
-    }),
-
-    multiValueLabel: (base) => ({
-      ...base,
       color: "white",
     }),
-
-    multiValueRemove: (base) => ({
-      ...base,
-      color: "white",
-      ":hover": {
-        backgroundColor: "red",
-        color: "white",
-      },
-    }),
-
     menuPortal: (base) => ({
       ...base,
-      zIndex: 9999, // Ensures the dropdown appears above other elements
+      zIndex: 9999, // Ensure it's on top of other elements
     }),
-
-    singleValue: (base) => ({
+    menu: (base) => ({
       ...base,
-      minWidth: "150px", // Set a narrower initial width for the value container
+      backgroundColor: "#222222",
       color: "white",
+      zIndex: 9999, // Ensure dropdown has a high z-index
     }),
-
-    valueContainer: (base) => ({
+    option: (base, { isFocused, isSelected }) => ({
       ...base,
-      minWidth: "150px", // Set a narrower initial width for the value container
-      width: "auto",     // Allow width to grow based on content
-    }),
-
-    dropdownIndicator: (base) => ({
-      ...base,
-      color: "white", // Color for the dropdown arrow
-      position: "absolute", // Position the dropdown indicator to the right
-      right: "10px", // Adjust this if needed to make the arrow appear on the right
+      backgroundColor: isSelected
+        ? "#555555"
+        : isFocused
+          ? "#333333"
+          : "#222222",
+      color: "white",
+      cursor: "pointer",
     }),
   };
 
-
+  const Dropdown = ({ options, onChange }) => (
+    <Select
+      options={options}
+      styles={customStyles}
+      menuPortalTarget={document.body} // Render dropdown outside its container
+      onChange={onChange}
+    />
+  );
 
   return (
     <div className="semester-container">
@@ -314,7 +275,6 @@ const CourseDetails = ({ department, regulation }) => {
                     onChange={(e) =>
                       handleChange(index, "course_name", e.target.value)
                     }
-                    spellCheck="true"
                   />
                 </td>
                 <td>
@@ -377,7 +337,7 @@ const CourseDetails = ({ department, regulation }) => {
                       }
                       closeMenuOnSelect={false}
                       styles={customStyles}
-                      menuPortalTarget={document.body} // Render dropdown outside of container
+                      menuPortalTarget={document.body}
                     />
                   ) : (
                     <span>Not Applicable</span>
